@@ -694,12 +694,12 @@ def set_acme(token, authorization):
 def generate_private_key():
     return subprocess.check_output([
         'openssl', 'genrsa', '4096',
-    ])
+    ]).rstrip('\n') + '\n'
 
 def generate_private_ec_key():
     return subprocess.check_output([
         'openssl', 'ecparam', '-name', 'prime256v1', '-genkey', '-noout',
-    ])
+    ]).rstrip('\n') + '\n'
 
 def generate_csr(private_key_path, domains):
     if len(domains) == 1:
@@ -762,9 +762,9 @@ def get_cert(domains):
 
     if not os.path.isfile(private_key_path):
         if ec_key:
-            private_key = generate_private_ec_key().rstrip('\n') + '\n'
+            private_key = generate_private_ec_key()
         else:
-            private_key = generate_private_key().rstrip('\n') + '\n'
+            private_key = generate_private_key()
         with open(private_key_path, 'w') as private_key_file:
             os.chmod(private_key_path, 0600)
             private_key_file.write(private_key)
@@ -773,7 +773,7 @@ def get_cert(domains):
             private_key = private_key_file.read().rstrip('\n') + '\n'
 
     if not os.path.isfile(account_key_path):
-        account_key = generate_private_key().rstrip('\n') + '\n'
+        account_key = generate_private_key()
         with open(account_key_path, 'w') as account_key_file:
             os.chmod(account_key_path, 0600)
             account_key_file.write(account_key)
