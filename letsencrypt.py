@@ -192,6 +192,7 @@ import os
 import os.path
 import subprocess
 import threading
+import socket
 import BaseHTTPServer
 
 LETS_ENCRYPT_INTER = """
@@ -685,6 +686,9 @@ class Request(BaseHTTPServer.BaseHTTPRequestHandler):
         except:
             self.send_response(500)
 
+class HTTPServer6(BaseHTTPServer.HTTPServer):
+    address_family = socket.AF_INET6
+
 def set_acme(token, authorization):
     global acme_token
     global acme_authorization
@@ -745,8 +749,8 @@ def get_acme_cert(account_key_path, csr_path):
     )
 
 def run_server():
-    server = BaseHTTPServer.HTTPServer(
-        ('0.0.0.0', 80),
+    server = HTTPServer6(
+        ('::', 80),
         Request,
     )
     server.serve_forever()
